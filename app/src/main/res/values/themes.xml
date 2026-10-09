@@ -1,0 +1,5 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. Compose draws the UI; this just sets the
+         window background/status bar before Compose takes over. -->
+    <style name="Theme.Aura" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

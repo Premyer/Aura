@@ -5,7 +5,7 @@ A modern Android application featuring an AI-powered assistant with chat functio
 ### Features
 
 - 💬 **Interactive Chat Interface** - Clean and intuitive conversation UI
-- 🤖 **AI Assistant** - Powered by your custom API endpoint
+- 🤖 **AI Assistant** - Powered directly by the Anthropic API (Claude)
 - 📱 **Modern UI** - Built with Jetpack Compose and Material Design 3
 - 🔄 **Real-time Communication** - Instant message responses
 - ⚡ **Kotlin-first** - Fully written in Kotlin with coroutines
@@ -29,7 +29,9 @@ Aura/
 │   │   │   │   └── AssistantViewModel.kt
 │   │   │   └── data/
 │   │   │       ├── AssistantRepository.kt
-│   │   │       └── AuraApiService.kt
+│   │   │       ├── AuraApiService.kt
+│   │   │       ├── AnthropicDto.kt
+│   │   │       └── ChatModels.kt
 │   │   └── AndroidManifest.xml
 │   └── build.gradle.kts
 ├── build.gradle.kts
@@ -40,8 +42,8 @@ Aura/
 ### Requirements
 
 - Android 8.0 (API 26) or higher
-- JDK 11 or higher
-- Gradle 8.0+
+- JDK 17 or higher
+- An [Anthropic API key](https://console.anthropic.com/settings/keys)
 
 ### Building the Project
 
@@ -51,12 +53,14 @@ git clone https://github.com/Premyer/Aura.git
 cd Aura
 ```
 
-2. Build the project:
+2. Configure your API key (see **Configuration** below).
+
+3. Build the project:
 ```bash
 ./gradlew build
 ```
 
-3. Build APK:
+4. Build APK:
 ```bash
 ./gradlew assembleRelease
 ```
@@ -65,11 +69,27 @@ The APK will be generated at: `app/build/outputs/apk/release/app-release.apk`
 
 ### Configuration
 
-Update the API endpoint in `app/src/main/java/com/premyer/aura/data/AuraApiService.kt`:
+The app calls the Anthropic Messages API (`https://api.anthropic.com/v1/messages`) directly from
+`AuraApiService.kt`. The API key is **not** hardcoded — it's read at build time from
+`local.properties`, which is already in `.gitignore` and never committed.
 
-```kotlin
-private val baseUrl = "https://ais-pre-6nunyp4pojxildv7adxgq3-523251667507.europe-west2.run.app"
+1. Copy the example file:
+```bash
+cp local.properties.example local.properties
 ```
+2. Open `local.properties` and set your key:
+```properties
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+```
+3. (Optional) Change the model used, in `app/build.gradle.kts`:
+```kotlin
+buildConfigField("String", "ANTHROPIC_MODEL", "\"claude-sonnet-5\"")
+```
+
+⚠️ **Security note:** embedding the API key in the app via `BuildConfig` is fine for development
+and personal use, but anyone can extract a key from a published APK. Before releasing this app
+publicly (e.g. on the Play Store), move the Anthropic call behind your own backend (e.g. the
+Cloud Run service this project used before) so the key never ships inside the app.
 
 ### Running Tests
 
@@ -84,8 +104,8 @@ private val baseUrl = "https://ais-pre-6nunyp4pojxildv7adxgq3-523251667507.europ
 - **Material Design 3** - Design system
 - **Kotlin Coroutines** - Asynchronous programming
 - **OkHttp** - HTTP client
-- **Retrofit** - REST client
 - **GSON** - JSON serialization
+- **Anthropic Messages API** - Claude as the AI backend
 
 ### License
 
