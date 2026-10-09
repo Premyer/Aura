@@ -91,6 +91,22 @@ and personal use, but anyone can extract a key from a published APK. Before rele
 publicly (e.g. on the Play Store), move the Anthropic call behind your own backend (e.g. the
 Cloud Run service this project used before) so the key never ships inside the app.
 
+### Building automatically with GitHub Actions
+
+Every push to `main` (and manual runs via the "Actions" tab) builds a debug APK in the cloud —
+no local Android SDK needed. To enable it:
+
+1. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add a new
+   repository secret named `ANTHROPIC_API_KEY` with your key as the value.
+2. Push to `main`, or trigger the **Build APK** workflow manually from the **Actions** tab.
+3. Once it finishes, open the workflow run and download the `aura-debug-apk` artifact — that's
+   `app-debug.apk`, already signed with the Android debug key so it installs directly on a
+   device or emulator for testing (`adb install app-debug.apk`).
+
+This produces a **debug** build for testing, not a Play Store release build (which needs its own
+signing key — see [Android's docs on app signing](https://developer.android.com/studio/publish/app-signing)
+when you're ready for that).
+
 ### Running Tests
 
 ```bash
