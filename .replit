@@ -1,5 +1,6 @@
 [nix]
 channel = "stable-25_05"
+packages = ["jdk17"]
 
 [agent]
 expertMode = true

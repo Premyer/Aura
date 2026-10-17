@@ -1,22 +1,7 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
-
-// Reads ANTHROPIC_API_KEY from local.properties (not checked into git).
-// Add a line like: ANTHROPIC_API_KEY=sk-ant-...
-val localProperties = Properties().apply {
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        load(FileInputStream(localPropertiesFile))
-    }
-}
-val anthropicApiKey: String = localProperties.getProperty("ANTHROPIC_API_KEY")
-    ?: System.getenv("ANTHROPIC_API_KEY")
-    ?: ""
 
 android {
     namespace = "com.premyer.aura"
@@ -31,9 +16,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Exposed at compile time as BuildConfig.ANTHROPIC_API_KEY
-        buildConfigField("String", "ANTHROPIC_API_KEY", "\"$anthropicApiKey\"")
-        buildConfigField("String", "ANTHROPIC_MODEL", "\"claude-sonnet-5\"")
     }
 
     buildTypes {
@@ -98,6 +80,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
