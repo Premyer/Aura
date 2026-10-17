@@ -12,8 +12,8 @@ class AuraNotificationService : NotificationListenerService() {
 
     fun snapshot(): String = activeNotifications?.take(30)?.joinToString("\n\n") { sbn ->
         val extras = sbn.notification.extras
-        "${sbn.packageName}\n${extras.getCharSequence("android.title").orEmpty()}\n" +
-            extras.getCharSequence("android.text").orEmpty().take(1000)
+        "${sbn.packageName}\n${extras.getCharSequence("android.title")?.toString().orEmpty()}\n" +
+            extras.getCharSequence("android.text")?.toString().orEmpty().take(1000)
     }.orEmpty().ifBlank { "Keine aktiven Benachrichtigungen." }
 
     companion object {

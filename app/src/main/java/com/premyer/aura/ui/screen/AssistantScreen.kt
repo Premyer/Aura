@@ -18,6 +18,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.premyer.aura.data.Provider
+import com.premyer.aura.data.ProviderConfig
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,9 +84,25 @@ fun AssistantScreen(viewModel: AssistantViewModel = viewModel()) {
         }
     }
 
+    if (uiState.showSettings) {
+        SettingsDialog(
+            initial = uiState.config,
+            loadProvider = viewModel::loadProvider,
+            onSave = viewModel::saveConfig,
+            onDismiss = viewModel::closeSettings
+        )
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.app_name)) })
+            TopAppBar(
+                title = { Text(stringResource(id = R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = viewModel::openSettings) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Einstellungen")
+                    }
+                }
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
@@ -180,4 +207,71 @@ private fun MessageInputBar(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsDialog(
+    initial: ProviderConfig,
+    loadProvider: (Provider) -> ProviderConfig,
+    onSave: (ProviderConfig) -> String?,
+    onDismiss: () -> Unit
+) {
+    var config by remember { mutableStateOf(initial) }
+    var expanded by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("KI-Anbieter einrichten") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+                    OutlinedTextField(
+                        value = config.provider.label,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Anbieter") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        Provider.values().forEach { p ->
+                            DropdownMenuItem(text = { Text(p.label) }, onClick = {
+                                config = loadProvider(p); expanded = false
+                            })
+                        }
+                    }
+                }
+                if (config.provider == Provider.CUSTOM) {
+                    OutlinedTextField(
+                        value = config.baseUrl,
+                        onValueChange = { config = config.copy(baseUrl = it.trim()) },
+                        label = { Text("API-Basis-URL") },
+                        singleLine = true
+                    )
+                }
+                OutlinedTextField(
+                    value = config.model,
+                    onValueChange = { config = config.copy(model = it.trim()) },
+                    label = { Text("Modell, z. B. claude-sonnet-4-5") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = config.apiKey,
+                    onValueChange = { config = config.copy(apiKey = it.trim()) },
+                    label = { Text("API-Schlüssel") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation()
+                )
+                Text(
+                    "Der Schlüssel wird nur verschlüsselt auf diesem Gerät gespeichert.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            }
+        },
+        confirmButton = { TextButton(onClick = { error = onSave(config) }) { Text("Speichern") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } }
+    )
 }

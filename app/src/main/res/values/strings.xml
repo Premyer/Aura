@@ -4,4 +4,5 @@
     <string name="send">Senden</string>
     <string name="error_generic">Etwas ist schiefgelaufen. Bitte versuche es erneut.</string>
     <string name="error_missing_api_key">Kein Anthropic API-Key konfiguriert. Trage ANTHROPIC_API_KEY in local.properties ein.</string>
+    <string name="accessibility_description">Erlaubt Aura, Inhalte auf dem Bildschirm zu lesen und Aktionen für dich auszuführen.</string>
 </resources>
