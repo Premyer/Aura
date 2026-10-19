@@ -1,0 +1,17 @@
+__pycache__/
+.venv/
+wallet/
+.claude/
+.cursor/
+.manus/
+.bolt/
+.devin/
+.openclaw/
+.replit/
+.aider/
+.social-wallet-secret
+.mnemonic
+.pk_*
+node_modules/
+package.json
+package-lock.json
