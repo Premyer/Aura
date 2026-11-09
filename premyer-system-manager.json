@@ -1,0 +1,30 @@
+{
+  "manager": "Premyer System Manager",
+  "repository": "Premyer/Aura",
+  "project_role": "Android AI assistant",
+  "control_repository": "Premyer/Premyer-Code-Agent-",
+  "runtime": "Codex Cloud task workspace",
+  "mode": "approval",
+  "default_access": "read-only",
+  "allowed_operations": [
+    "repository inspection",
+    "local tests",
+    "build and dependency analysis",
+    "proposed changes in isolated task workspace"
+  ],
+  "remote_write_policy": "Explicit per-action approval required; no unattended remote writes",
+  "secrets_policy": "No secrets in source, manifests, logs, prompts, or APKs; use scoped managed secrets",
+  "privacy_policy": "Keep prompts and user content out of telemetry; provider keys remain server-side.",
+  "forbidden_without_explicit_approval": [
+    "push",
+    "pull request creation or update",
+    "merge",
+    "release",
+    "deployment",
+    "workflow dispatch",
+    "repository settings or permission changes",
+    "device enrollment or remote shell",
+    "destructive remote operations"
+  ],
+  "telemetry": "Operational metadata only"
+}
